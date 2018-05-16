@@ -317,7 +317,7 @@ int main(void)
 
 		if (currentTime - lastTimeCheck >= 1.0) { // If last prinf() was more than 1sec ago
 												  // printf and reset
-			printf("%f frame/s\n", double(nbFrames));
+			printf("%d frame/s\n", nbFrames);
 			nbFrames = 0;
 			lastTimeCheck += 1.0;
 		}
@@ -615,7 +615,7 @@ int main(void)
 
 		for (int i = 0; i<newparticles_rain; i++) {
 			int particleIndex_rain = FindUnusedParticle();
-			RaindropsContainer[particleIndex_rain].life = 6.0f; // This particle will live 5 seconds.
+			RaindropsContainer[particleIndex_rain].life = 1.0f;
 			int x = rand() % 10;
 			int z = rand() % 24;
 			RaindropsContainer[particleIndex_rain].pos = glm::vec3(x - 5, 10.0f, z - 18);
