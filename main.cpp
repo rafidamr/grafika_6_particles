@@ -43,7 +43,7 @@ struct Particle {
 };
 
 const int MaxParticles = 100000;
-Particle ParticlesContainer[100*MaxParticles];
+Particle ParticlesContainer[100 * MaxParticles];
 Particle RaindropsContainer[MaxParticles];
 int LastUsedParticle = 0;
 
@@ -271,14 +271,14 @@ int main(void)
 	// The VBO containing the 4 vertices of the particles.
 	// Thanks to instancing, they will be shared by all particles.
 	static const GLfloat g_vertex_buffer_data_rain[] = {
-		-0.05f, 0.6f, 0.0f, 
-		0.05f, 0.6f, 0.0f,
-		0.1f,  0.5f, 0.0f,
-		0.1f, -0.5f, 0.0f,
-		0.05f, -0.6f, 0.0f,
-		-0.05f, -0.6f, 0.0f,
-		-0.1f, -0.5f, 0.0f,
-		-0.1f,  0.5f, 0.0f,
+		-0.05f, 0.6f, 0.2f,
+		0.05f, 0.6f, 0.2f,
+		0.1f,  0.5f, 0.2f,
+		0.1f, -0.5f, 0.5f,
+		0.05f, -0.6f, 0.5f,
+		-0.05f, -0.6f, 0.5f,
+		-0.1f, -0.5f, 0.5f,
+		-0.1f,  0.5f, 0.2f,
 	};
 	GLuint billboard_vertex_buffer_rain;
 	glGenBuffers(1, &billboard_vertex_buffer_rain);
@@ -303,6 +303,8 @@ int main(void)
 
 	//============================================ END RAIN PARTICLES =============================================
 
+	float lastTimeCheck = lastTime;
+
 	do {
 
 		// Measure speed
@@ -310,9 +312,14 @@ int main(void)
 		nbFrames++;
 		if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1sec ago
 											 // printf and reset
-			printf("%f ms/frame\n", 1000.0 / double(nbFrames));
-			nbFrames = 0;
 			lastTime += 1.0;
+		}
+
+		if (currentTime - lastTimeCheck >= 1.0) { // If last prinf() was more than 1sec ago
+												  // printf and reset
+			printf("%f frame/s\n", double(nbFrames));
+			nbFrames = 0;
+			lastTimeCheck += 1.0;
 		}
 
 		// Clear the screen
@@ -412,7 +419,7 @@ int main(void)
 
 		double delta = currentTime - lastTime;
 		lastTime = currentTime;
-		
+
 		// We will need the camera's position in order to sort the particles
 		// w.r.t the camera's distance.
 		// There should be a getCameraPosition() function in common/controls.cpp, 
@@ -421,7 +428,7 @@ int main(void)
 
 		glm::mat4 ViewProjectionMatrix = ProjectionMatrix * ViewMatrix;
 
-		
+
 		// Generate 10 new particule each millisecond,
 		// but limit this to 16 ms (60 fps), or if you have 1 long frame (1sec),
 		// newparticles will be huge and the next frame even longer.
@@ -516,7 +523,7 @@ int main(void)
 		glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
 		glBufferData(GL_ARRAY_BUFFER, MaxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
 		glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLubyte) * 4, g_particule_color_data);
-		
+
 		// BLEND STILL NEEDS A PIX !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		glEnablei(4, GL_BLEND);
 		glBlendFunci(4, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -608,19 +615,19 @@ int main(void)
 
 		for (int i = 0; i<newparticles_rain; i++) {
 			int particleIndex_rain = FindUnusedParticle();
-			RaindropsContainer[particleIndex_rain].life = 7.5f; // This particle will live 5 seconds.
+			RaindropsContainer[particleIndex_rain].life = 6.0f; // This particle will live 5 seconds.
 			int x = rand() % 10;
 			int z = rand() % 24;
-			RaindropsContainer[particleIndex_rain].pos = glm::vec3(x-5, 8.0f, z-18);
+			RaindropsContainer[particleIndex_rain].pos = glm::vec3(x - 5, 10.0f, z - 18);
 
-			glm::vec3 maindir = glm::vec3(0.0f, -1.0f, 0.1f);
+			glm::vec3 maindir = glm::vec3(0.0f, -10.0f, 1.0f);
 			// Very bad way to generate a random direction; 
 			// See for instance http://stackoverflow.com/questions/5408276/python-uniform-spherical-distribution instead,
 			// combined with some user-controlled parameters (main direction, spread, etc)
 			/*glm::vec3 randomdir = glm::vec3(
-				(rand() % 2000 - 1000.0f) / 1000.0f,
-				-(rand() % 2000 - 1000.0f) / 1000.0f,
-				(rand() % 2000 - 1000.0f) / 1000.0f
+			(rand() % 2000 - 1000.0f) / 1000.0f,
+			-(rand() % 2000 - 1000.0f) / 1000.0f,
+			(rand() % 2000 - 1000.0f) / 1000.0f
 			);*/
 
 			RaindropsContainer[particleIndex_rain].speed = maindir;
@@ -694,7 +701,7 @@ int main(void)
 		glBufferData(GL_ARRAY_BUFFER, MaxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
 		glBufferSubData(GL_ARRAY_BUFFER, 0, RaindropsCount * sizeof(GLubyte) * 4, g_particule_color_data_rain);
 
-		
+
 		// BLEND STILL NEEDS A PIX !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		glEnablei(7, GL_BLEND);
 		glBlendFunci(7, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
